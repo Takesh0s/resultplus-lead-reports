@@ -1,27 +1,31 @@
 # 📊 ResultPlus Lead Reports
 
-Automated lead report generator built during my internship at **ResultPlus**, a company using the **Helena CRM White-Label** system.
+Automated diagnostic and reporting toolkit built during my internship at **ResultPlus**, a company using the **Helena CRM White-Label** system.
 
-This project automates the process of **collecting, validating, and reporting leads** from marketing campaigns — replacing a manual workflow that was prone to errors and delays.
+This project was designed to automate the process of **collecting, validating, and reporting leads** from marketing campaigns — replacing a manual workflow that was prone to human error and data delays.
 
 ---
 
-## 🧠 Overview
+## 🧠 Background
 
-After an issue with AWS infrastructure caused inconsistencies between **Meta Ads** and **CRM reports**, the marketing team needed a reliable and automated way to verify the number of leads captured by each campaign.
+During development, the **Helena CRM API** presented a major limitation: it only exposed session data up to **September 1st**, regardless of more recent activity.  
+Because of this, several **diagnostic and endpoint exploration scripts** were created to probe alternative URLs, Swagger specifications, and hidden routes that could reveal more recent data.
 
-This system connects to the **Helena CRM API**, fetches all chat sessions, filters recent and valid ones, and automatically generates reports in **Google Sheets** and **Google Docs** for daily validation.
+Even with these restrictions, the system successfully:
+- Automated **lead data collection** within the accessible date range;
+- Generated **structured JSON reports** and **Google Docs/Sheets summaries**;
+- Provided a **reproducible and transparent** process for lead validation.
 
 ---
 
 ## ⚙️ Core Features
 
-- 🔄 **Automated data collection** from Helena CRM (private API)  
-- 📑 **Report generation** in Google Sheets and Google Docs  
-- 🧩 **Environment variable management** via `.env`  
-- 🔐 **Google Cloud integration** using service account credentials  
-- 🧪 **Diagnostic scripts** for testing API endpoints, pagination, and hidden sessions  
-- 🧱 **Modular architecture**, easy to extend to new CRM endpoints  
+- 🔄 **Automated data fetching** from Helena CRM (private API)
+- 🧪 **Diagnostic utilities** to explore hidden or undocumented endpoints
+- 📊 **Report generation** using Google Sheets and Google Docs APIs
+- 🧩 **Environment management** via `.env` and service account keys
+- 🧱 **Modular and package-based architecture**
+- 🕒 **Timestamped output files** for traceability and auditability
 
 ---
 
@@ -29,11 +33,11 @@ This system connects to the **Helena CRM API**, fetches all chat sessions, filte
 
 | Category | Technology |
 |-----------|-------------|
-| Language | Python |
-| API Client | `requests` |
+| Language | Python 3.10+ |
+| HTTP Client | `requests` |
 | Cloud Integration | `google-api-python-client`, `google-auth` |
-| Secrets Management | `python-dotenv` |
-| Formatting | `json`, `datetime`, `os` |
+| Environment | `python-dotenv` |
+| Utilities | `datetime`, `logging`, `os`, `json` |
 
 ---
 
@@ -41,71 +45,97 @@ This system connects to the **Helena CRM API**, fetches all chat sessions, filte
 
 ```bash
 resultplus-reports/
-├── fetch_result.py            → Fetches data from Helena CRM
-├── generate_report.py         → Creates and updates reports in Google Docs/Sheets
-├── find_hidden_sessions.py    → Tests for hidden sessions in the API
-├── find_real_swagger_json.py  → Attempts to discover actual API endpoints
-├── scan_api_swagger.py        → Scans the Swagger specification
-├── scan_swagger.py            → Additional endpoint analysis
-├── test_endpoints.py          → Verifies endpoint accessibility
-├── test_pagination.py         → Tests pagination behavior in responses
-├── test_query_params.py       → Validates query parameters for filtering
-├── test_search_post.py        → Tests POST endpoints for search operations
-├── requirements.txt           → Dependencies
-├── .env                       → Environment variables (ignored via .gitignore)
-├── gcp-key.json               → Google Cloud credentials (ignored via .gitignore)
-└── .gitignore                 → Excludes sensitive/local files
+├── src/
+│ └── resultplus_reports/
+│ ├── init.py → Package initialization and metadata
+│ ├── main.py → Entry point for python -m resultplus_reports
+│ ├── fetch_result.py → Fetches data from Helena CRM
+│ ├── generate_report.py → Generates reports in Google Docs/Sheets
+│ ├── find_hidden_sessions.py → Tests for hidden session endpoints
+│ ├── find_real_swagger_json.py → Attempts to locate the true Swagger/OpenAPI JSON
+│ ├── scan_api_swagger.py → Scans API for possible hidden routes
+│ ├── scan_swagger.py → Additional endpoint analysis
+│ ├── test_endpoints.py → Verifies endpoint accessibility
+│ ├── test_pagination.py → Tests pagination response behavior
+│ ├── test_query_params.py → Validates query parameters
+│ └── test_search_post.py → Tests POST search endpoints
+├── requirements.txt → Python dependencies
+├── pyproject.toml → Package metadata and build system
+├── .env → Environment variables (ignored via .gitignore)
+├── gcp-key.json → Google Cloud credentials (ignored via .gitignore)
+└── .gitignore → Excludes sensitive/local files
 ```
 
 ---
 
 ## 🧾 Example Workflow
 
-1. **Set up environment variables**  
-   Fill your `.env` file with required API tokens and Google document IDs.
+1. **Set up your environment variables**
 
-2. **Run data collection**
-   ```bash
-   python fetch_result.py
+   Create a `.env` file containing:
+   ```
+   HELENA_API_KEY=...
+   GOOGLE_SHEET_ID=...
+   GOOGLE_DOC_ID=...
    ```
 
-3. **Generate report automatically**
+2. **Run data fetching**
    ```bash
-   python generate_report.py
+   python -m resultplus_reports
+   # or explicitly:
+   python src/resultplus_reports/fetch_result.py
    ```
 
-4. **Access generated reports**  
-   Reports are automatically published and updated in Google Sheets and Google Docs.
+3. **Generate the report**
+   ```bash
+   python src/resultplus_reports/generate_report.py
+   ```
+
+4. **Access the generated files**
+
+   - Leads are saved as `leads_YYYYMMDD.json`
+   - Reports are automatically synced to Google Sheets and Docs
+
+---
+
+## 🔍 Diagnostics
+
+Due to API restrictions, the following tools were developed to explore alternative data sources and confirm endpoint behavior:
+
+- `find_hidden_sessions.py` — probes multiple session-related routes for recent data  
+- `find_real_swagger_json.py` — discovers actual Swagger/OpenAPI references  
+- `scan_api_swagger.py` and `scan_swagger.py` — inspect and parse endpoint metadata  
+- `test_*.py` scripts — validate request limits, pagination, and query filtering
+
+These diagnostics ensured that every possible data retrieval method was tested and documented — even under restrictive API conditions.
 
 ---
 
 ## 🔒 Security
 
-Sensitive files are not included in this repository for safety:
+Sensitive configuration files are intentionally excluded:
 
 ```
 .env  
 gcp-key.json  
-leads.json  
-sent.json  
+leads_*.json  
+sent.json
 ```
 
-These files are listed in `.gitignore` and must be created locally when running the project.
+All are listed in `.gitignore` and must be created locally when executing the project.
 
 ---
 
-## 🚀 Future Improvements
+## 🏁 Version
 
-- ☁️ **Deploy as a serverless Cloud Function**  
-- 📈 **Add dashboard visualization (e.g., Streamlit or Flask + Chart.js)**  
-- 🧠 **Add AI-assisted lead classification and filtering**  
-- 🧰 **Refactor into a reusable package for CRM integrations**  
+**v1.0.0** — stable, archived release.  
+This version reflects the final working state of the system before API access was restricted by the Helena platform.
 
 ---
 
 ## 👨‍💻 Author
 
-**Luiz Takeshi**  
+**Luiz Phillipe (Takeshi)**  
 🔗 [github.com/Takesh0s](https://github.com/Takesh0s)
 
-Developed during my time at **ResultPlus** — later adapted and published for educational and portfolio purposes.
+Developed during my internship at **ResultPlus**, later refined and published for **educational and portfolio purposes**.
