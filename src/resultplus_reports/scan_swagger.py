@@ -1,7 +1,23 @@
+"""
+Module: scan_swagger
+--------------------
+
+Performs an automated scan of potential Swagger and OpenAPI endpoints
+for a specified base domain. The script attempts to discover public or
+semi-public documentation endpoints such as `/swagger.json`, `/openapi.json`,
+or Swagger UI interfaces.
+
+This utility assists in identifying whether an API exposes its schema
+or documentation in a predictable location, often useful for diagnostics
+and integration validation tasks.
+"""
+
 import requests
+
 
 BASE_URL = "https://chat.resultplus.com.br"
 
+# Common Swagger and OpenAPI documentation paths
 PATHS = [
     "/swagger",
     "/swagger/",
@@ -28,27 +44,42 @@ PATHS = [
     "/swagger-resources/configuration/security",
 ]
 
-print("🔍 Testando endpoints Swagger/OpenAPI no domínio:", BASE_URL, "\n")
 
-for path in PATHS:
-    url = BASE_URL + path
-    try:
-        r = requests.get(url, timeout=5)
-        code = r.status_code
-        ct = r.headers.get("Content-Type", "")
-        if code == 200 and ("json" in ct or "html" in ct):
-            print(f"✅ {url} → {code} ({ct})")
-            if "json" in ct:
-                print("📄 Trecho inicial:", r.text[:300], "\n")
+def scan_swagger_endpoints():
+    """
+    Scans the predefined paths under the base domain and reports the HTTP
+    response status, content type, and any indications of Swagger/OpenAPI
+    documentation or UI pages.
+
+    This function prints formatted diagnostic messages to the console.
+    """
+    print(f"🔍 Scanning Swagger/OpenAPI endpoints for domain: {BASE_URL}\n")
+
+    for path in PATHS:
+        url = BASE_URL + path
+        try:
+            response = requests.get(url, timeout=5)
+            code = response.status_code
+            content_type = response.headers.get("Content-Type", "")
+
+            if code == 200 and ("json" in content_type or "html" in content_type):
+                print(f"✅ {url} → {code} ({content_type})")
+                if "json" in content_type:
+                    print("📄 Snippet:", response.text[:300], "\n")
+                else:
+                    print("🌐 HTML page detected (possibly Swagger UI)\n")
+            elif code in (401, 403):
+                print(f"🔒 {url} → {code} (restricted access)")
+            elif code == 404:
+                # Common case — endpoint does not exist
+                continue
             else:
-                print("🌐 Página HTML detectada (Swagger UI?)\n")
-        elif code in (401, 403):
-            print(f"🔒 {url} → {code} (acesso restrito)")
-        elif code == 404:
-            pass
-        else:
-            print(f"⚠️ {url} → {code}")
-    except requests.exceptions.RequestException as e:
-        print(f"❌ Erro em {url}: {e}")
+                print(f"⚠️ {url} → {code}")
+        except requests.exceptions.RequestException as error:
+            print(f"❌ Error accessing {url}: {error}")
 
-print("\n🧭 Teste concluído!")
+    print("\n🧭 Scan completed!")
+
+
+if __name__ == "__main__":
+    scan_swagger_endpoints()
