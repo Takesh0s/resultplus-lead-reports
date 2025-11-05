@@ -16,12 +16,12 @@ This system connects to the **Helena CRM API**, fetches all chat sessions, filte
 
 ## ⚙️ Core Features
 
-- 🔄 **Automated data collection** from Helena CRM (private API)
-- 📑 **Report generation** in Google Sheets and Google Docs
-- 🧩 **Environment variable management** via `.env`
-- 🔐 **Google Cloud integration** using service account credentials
-- 🧪 **Diagnostic scripts** for testing API endpoints, pagination, and hidden sessions
-- 🧱 **Modular architecture**, easy to extend to new CRM endpoints
+- 🔄 **Automated data collection** from Helena CRM (private API)  
+- 📑 **Report generation** in Google Sheets and Google Docs  
+- 🧩 **Environment variable management** via `.env`  
+- 🔐 **Google Cloud integration** using service account credentials  
+- 🧪 **Diagnostic scripts** for testing API endpoints, pagination, and hidden sessions  
+- 🧱 **Modular architecture**, easy to extend to new CRM endpoints  
 
 ---
 
@@ -39,21 +39,22 @@ This system connects to the **Helena CRM API**, fetches all chat sessions, filte
 
 ## 🧱 Project Structure
 
+```bash
 resultplus-reports/
-├── fetch_result.py → Fetches data from Helena CRM
-├── generate_report.py → Creates and updates reports in Google Docs/Sheets
-├── find_hidden_sessions.py → Tests for hidden sessions in the API
-├── find_real_swagger_json.py → Attempts to discover actual API endpoints
-├── scan_api_swagger.py → Scans the Swagger specification
-├── scan_swagger.py → Additional endpoint analysis
-├── test_endpoints.py → Verifies endpoint accessibility
-├── test_pagination.py → Tests pagination behavior in responses
-├── test_query_params.py → Validates query parameters for filtering
-├── test_search_post.py → Tests POST endpoints for search operations
-├── requirements.txt → Dependencies
-├── .env → Environment variables (ignored via .gitignore)
-├── gcp-key.json → Google Cloud credentials (ignored via .gitignore)
-└── .gitignore → Excludes sensitive/local files
+├── fetch_result.py            → Fetches data from Helena CRM
+├── generate_report.py         → Creates and updates reports in Google Docs/Sheets
+├── find_hidden_sessions.py    → Tests for hidden sessions in the API
+├── find_real_swagger_json.py  → Attempts to discover actual API endpoints
+├── scan_api_swagger.py        → Scans the Swagger specification
+├── scan_swagger.py            → Additional endpoint analysis
+├── test_endpoints.py          → Verifies endpoint accessibility
+├── test_pagination.py         → Tests pagination behavior in responses
+├── test_query_params.py       → Validates query parameters for filtering
+├── test_search_post.py        → Tests POST endpoints for search operations
+├── requirements.txt           → Dependencies
+├── .env                       → Environment variables (ignored via .gitignore)
+├── gcp-key.json               → Google Cloud credentials (ignored via .gitignore)
+└── .gitignore                 → Excludes sensitive/local files
 
 ---
 
@@ -62,16 +63,18 @@ resultplus-reports/
 1. **Set up environment variables**  
    Fill your `.env` file with required API tokens and Google document IDs.
 
-2. **Run data collection**  
+2. **Run data collection**
    ```bash
    python fetch_result.py
+   ```
 
-3. **Generate report automatically**  
+3. **Generate report automatically**
+   ```bash
    python generate_report.py
+   ```
 
 4. **Access generated reports**  
    Reports are automatically published and updated in Google Sheets and Google Docs.
-
 
 ---
 
@@ -79,9 +82,29 @@ resultplus-reports/
 
 Sensitive files are not included in this repository for safety:
 
-.env
-gcp-key.json
-leads.json
-sent.json
+```
+.env  
+gcp-key.json  
+leads.json  
+sent.json  
+```
 
-These files are listed in .gitignore and must be created locally when running the project.
+These files are listed in `.gitignore` and must be created locally when running the project.
+
+---
+
+## 🚀 Future Improvements
+
+- ☁️ **Deploy as a serverless Cloud Function**  
+- 📈 **Add dashboard visualization (e.g., Streamlit or Flask + Chart.js)**  
+- 🧠 **Add AI-assisted lead classification and filtering**  
+- 🧰 **Refactor into a reusable package for CRM integrations**  
+
+---
+
+## 👨‍💻 Author
+
+**Luiz Takeshi**  
+🔗 [github.com/Takesh0s](https://github.com/Takesh0s)
+
+Developed during my time at **ResultPlus** — later adapted and published for educational and portfolio purposes.
