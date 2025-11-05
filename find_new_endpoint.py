@@ -1,23 +1,37 @@
-import requests, os, json
+"""
+find_new_endpoint.py
+---------------------
+Attempts to discover active or undocumented API endpoints in the Helena CRM.
+
+This script systematically tests a list of potential endpoint paths to detect
+which ones respond successfully or return data indicating valid chat sessions.
+
+Environment variables required:
+- HELENA_API_URL: Base URL of the Helena API
+- HELENA_API_KEY: Bearer token for authentication
+"""
+
+import os
+import requests
 from dotenv import load_dotenv
 
 load_dotenv()
 
-BASE = os.getenv("HELENA_API_URL")
+BASE_URL = os.getenv("HELENA_API_URL", "https://api.chat.resultplus.com.br")
 TOKEN = os.getenv("HELENA_API_KEY")
 
-headers = {
+HEADERS = {
     "Authorization": f"Bearer {TOKEN}",
     "Content-Type": "application/json"
 }
 
-params = {
+PARAMS = {
     "startDate": "2025-10-01T00:00:00Z",
     "endDate": "2025-10-31T23:59:59Z",
     "size": 5
 }
 
-paths = [
+ENDPOINTS = [
     "/chat2/session",
     "/chat2/v1/session",
     "/chat2/v1/session/search",
@@ -36,31 +50,32 @@ paths = [
     "/session/search",
 ]
 
-print(f"🔍 Buscando endpoints ativos no domínio: {BASE}\n")
+print(f"🔍 Scanning potential endpoints under: {BASE_URL}\n")
 
-for path in paths:
-    url = f"{BASE}{path}"
+for path in ENDPOINTS:
+    url = f"{BASE_URL}{path}"
     try:
-        r = requests.get(url, headers=headers, params=params, timeout=15)
-        print(f"➡️ Testando: {url}")
-        print("Status:", r.status_code)
+        print(f"➡️ Testing: {url}")
+        response = requests.get(url, headers=HEADERS, params=PARAMS, timeout=15)
+        status = response.status_code
+        content_preview = response.text.strip()[:300]
 
-        content = r.text.strip()[:300]
-        print(content)
+        print(f"   → Status: {status}")
+        print(f"   → Response snippet: {content_preview}")
 
-        if any(mes in content for mes in ["2025-10", "2025-09", "2025-11"]):
-            print("✅ POSSÍVEL ENDPOINT CORRETO (contém dados recentes!)")
-        elif "InternalPort" in content or "Incorrect URL" in content:
-            print("⚠️ Caminho interno incorreto (erro de roteamento)")
-        elif "Not Found" in content or r.status_code == 404:
-            print("❌ Não encontrado")
-        elif r.status_code == 500:
-            print("⚠️ Erro interno do servidor")
+        if any(m in content_preview for m in ["2025-10", "2025-09", "2025-11"]):
+            print("✅ Possible valid endpoint (contains recent data!)")
+        elif "InternalPort" in content_preview or "Incorrect URL" in content_preview:
+            print("⚠️ Internal routing error (likely incorrect path)")
+        elif "Not Found" in content_preview or status == 404:
+            print("❌ Not found")
+        elif status == 500:
+            print("⚠️ Internal server error")
         else:
-            print("ℹ️ Endpoint respondeu, mas sem dados recentes")
+            print("ℹ️ Responded but no recent data")
 
         print("-" * 80)
 
     except Exception as e:
-        print(f"❌ Erro ao testar {url}: {e}")
+        print(f"❌ Error testing {url}: {e}")
         print("-" * 80)
