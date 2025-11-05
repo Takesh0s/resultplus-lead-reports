@@ -55,6 +55,7 @@ resultplus-reports/
 ├── .env                       → Environment variables (ignored via .gitignore)
 ├── gcp-key.json               → Google Cloud credentials (ignored via .gitignore)
 └── .gitignore                 → Excludes sensitive/local files
+```
 
 ---
 
