@@ -1,0 +1,12 @@
+.env
+gcp-key.json
+
+__pycache__/
+*.pyc
+
+.vscode/
+.idea/
+*.log
+
+.DS_Store
+Thumbs.db
